@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const { initializeDatabase } = require('./config/database');
+const { pool } = require('./config/database');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -40,6 +40,24 @@ app.get('/', (req, res) => {
   });
 });
 
+// Database health check
+app.get('/health', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.status(200).json({
+      success: true,
+      message: 'Database connected',
+      timestamp: result.rows[0].now
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Database connection failed',
+      error: error.message
+    });
+  }
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
@@ -63,20 +81,40 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Initialize database and start server
+// Start server
 const startServer = async () => {
   try {
-    // Initialize database tables
-    await initializeDatabase();
+    // Test database connection
+    await pool.query('SELECT NOW()');
+    console.log('✅ Database connection verified');
     
     // Start listening
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🌐 API Base URL: http://localhost:${PORT}`);
+      console.log('');
+      console.log('╔════════════════════════════════════════╗');
+      console.log('║                                        ║');
+      console.log('║   📚 StudyPlanner API Running 📚      ║');
+      console.log('║                                        ║');
+      console.log(`║   Port: ${PORT}                           ║`);
+      console.log(`║   Environment: ${process.env.NODE_ENV || 'development'}            ║`);
+      console.log('║                                        ║');
+      console.log('║   Ready to plan your studies! 🎯      ║');
+      console.log('║                                        ║');
+      console.log('╚════════════════════════════════════════╝');
+      console.log('');
+      console.log('📡 API Endpoints:');
+      console.log('   - GET  /health           - Database health check');
+      console.log('   - POST /api/auth/register - Register new user');
+      console.log('   - POST /api/auth/login    - User login');
+      console.log('   - GET  /api/courses       - Get all courses');
+      console.log('   - GET  /api/assignments   - Get all assignments');
+      console.log('');
+      console.log('💡 Tip: Run "npm run init-db" to initialize database tables');
+      console.log('');
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
+    console.error('💡 Make sure to run "npm run init-db" first to create database tables');
     process.exit(1);
   }
 };
