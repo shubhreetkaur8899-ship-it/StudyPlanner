@@ -1,7 +1,7 @@
 # API Testing Guide - Postman with Render
 
 ## Base URL
-**Production (Render):** `https://your-studyplanner-app.onrender.com`
+**Production (Render):** `https://studyplanner-api.onrender.com`
 
 Replace with your actual Render deployment URL.
 

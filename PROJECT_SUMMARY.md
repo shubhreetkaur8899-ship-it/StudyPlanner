@@ -516,7 +516,7 @@ The backend provides a solid foundation for Sprint 2 frontend development and Sp
 
 **API URL:** https://studyplanner-api.onrender.com
 
-**GitHub:** [Your Repository URL]
+**GitHub:** https://github.com/shubhreetkaur8899-ship-it/StudyPlanner
 
 **Student:** Shubhreet Kaur  
 **Date:** February 5, 2026  

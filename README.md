@@ -15,7 +15,7 @@ StudyPlanner is a productivity web application designed to help students track t
 
 ### Live Demo
 - **API URL:** `https://studyplanner-api.onrender.com` (to be deployed)
-- **GitHub:** [Your Repository URL]
+- **GitHub:** `https://github.com/shubhreetkaur8899-ship-it/StudyPlanner`
 
 ---
 
@@ -75,7 +75,7 @@ StudyPlanner is a productivity web application designed to help students track t
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/StudyPlanner.git
+git clone Git_URL
 cd StudyPlanner/backend
 ```
 
