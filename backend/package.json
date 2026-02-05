@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "init-db": "node scripts/initDatabase.js"
   },
   "keywords": ["express", "postgresql", "api", "studyplanner"],
   "author": "Shubhreet Kaur",
