@@ -1,0 +1,872 @@
+{
+  "info": {
+    "_postman_id": "studyplanner-api-collection",
+    "name": "StudyPlanner API",
+    "description": "Complete API collection for StudyPlanner backend. Tests all CRUD endpoints for Auth, Courses, and Assignments.\n\nHow to use:\n1. Run POST /Register User first\n2. Run POST /Login - the token is auto-saved to {{token}} variable\n3. All protected routes use {{token}} automatically\n4. Note the course_id and assignment_id from create responses to use in update/delete requests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://studyplanner-api.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "GET Root - API Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            },
+            "description": "Returns API status and available endpoints. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - API Running",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/",
+                  "host": ["{{base_url}}"],
+                  "path": [""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"StudyPlanner API is running\",\n  \"version\": \"1.0.0\",\n  \"endpoints\": {\n    \"auth\": \"/api/auth\",\n    \"courses\": \"/api/courses\",\n    \"assignments\": \"/api/assignments\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET Health - Database Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Verifies the database connection is alive. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - DB Connected",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": ["{{base_url}}"],
+                  "path": ["health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Database connected\",\n  \"timestamp\": \"2026-02-26T12:00:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('token', body.data.token);",
+                  "    console.log('Token saved:', body.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Shubhreet Kaur\",\n  \"email\": \"shubhreet@test.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user. Password is hashed with bcrypt before storing. Expected: 201 Created"
+          },
+          "response": [
+            {
+              "name": "201 Created - User Registered",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Shubhreet Kaur\",\n  \"email\": \"shubhreet@test.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"user\": {\n      \"userId\": 1,\n      \"name\": \"Shubhreet Kaur\",\n      \"email\": \"shubhreet@test.com\",\n      \"createdAt\": \"2026-02-26T12:00:00.000Z\"\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n  }\n}"
+            },
+            {
+              "name": "400 Bad Request - Email Already Exists",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Shubhreet Kaur\",\n  \"email\": \"shubhreet@test.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"message\": \"User with this email already exists\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('token', body.data.token);",
+                  "    console.log('Token saved:', body.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"shubhreet@test.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login and receive a JWT token. The test script auto-saves the token to {{token}} for use in protected routes. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - Login Successful",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"shubhreet@test.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"user\": {\n      \"userId\": 1,\n      \"name\": \"Shubhreet Kaur\",\n      \"email\": \"shubhreet@test.com\"\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n  }\n}"
+            },
+            {
+              "name": "401 Unauthorized - Wrong Password",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"shubhreet@test.com\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Invalid credentials\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "GET All Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/courses",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses"]
+            },
+            "description": "Get all courses for the authenticated user. Requires JWT token. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - All Courses",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/courses",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"count\": 1,\n  \"data\": [\n    {\n      \"course_id\": 1,\n      \"user_id\": 1,\n      \"course_name\": \"Full Stack Development\",\n      \"course_code\": \"PROG2500\",\n      \"semester\": \"Winter 2026\",\n      \"created_at\": \"2026-02-26T12:00:00.000Z\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "401 Unauthorized - No Token",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/courses",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"success\": false,\n  \"message\": \"No token provided, authorization denied\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET Single Course by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/courses/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses", "1"]
+            },
+            "description": "Get a specific course by its ID. Replace 1 with the actual course_id. Expected: 200 OK or 404 if not found"
+          },
+          "response": [
+            {
+              "name": "200 OK - Course Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/courses/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"course_id\": 1,\n    \"user_id\": 1,\n    \"course_name\": \"Full Stack Development\",\n    \"course_code\": \"PROG2500\",\n    \"semester\": \"Winter 2026\",\n    \"created_at\": \"2026-02-26T12:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/courses/9999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses", "9999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Course not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_name\": \"Full Stack Development\",\n  \"course_code\": \"PROG2500\",\n  \"semester\": \"Winter 2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/courses",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses"]
+            },
+            "description": "Create a new course for the authenticated user. Expected: 201 Created"
+          },
+          "response": [
+            {
+              "name": "201 Created - Course Added",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"course_name\": \"Full Stack Development\",\n  \"course_code\": \"PROG2500\",\n  \"semester\": \"Winter 2026\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/courses",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Course created successfully\",\n  \"data\": {\n    \"course_id\": 1,\n    \"user_id\": 1,\n    \"course_name\": \"Full Stack Development\",\n    \"course_code\": \"PROG2500\",\n    \"semester\": \"Winter 2026\",\n    \"created_at\": \"2026-02-26T12:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_name\": \"Full Stack Development - Updated\",\n  \"semester\": \"Winter 2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/courses/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses", "1"]
+            },
+            "description": "Update an existing course by ID. Replace 1 with actual course_id. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - Course Updated",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"course_name\": \"Full Stack Development - Updated\",\n  \"semester\": \"Winter 2026\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/courses/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Course updated successfully\",\n  \"data\": {\n    \"course_id\": 1,\n    \"user_id\": 1,\n    \"course_name\": \"Full Stack Development - Updated\",\n    \"course_code\": \"PROG2500\",\n    \"semester\": \"Winter 2026\",\n    \"created_at\": \"2026-02-26T12:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"course_name\": \"Updated Name\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/courses/9999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses", "9999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Course not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE Course",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/courses/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses", "1"]
+            },
+            "description": "Delete a course by ID. Also deletes all linked assignments (CASCADE). Replace 1 with actual course_id. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - Course Deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/courses/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Course deleted successfully\",\n  \"data\": {\n    \"course_id\": 1,\n    \"course_name\": \"Full Stack Development\"\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/courses/9999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "courses", "9999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Course not found\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Assignments",
+      "item": [
+        {
+          "name": "GET All Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assignments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "assignments"]
+            },
+            "description": "Get all assignments for the authenticated user across all their courses. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - All Assignments",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/assignments",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"count\": 1,\n  \"data\": [\n    {\n      \"assignment_id\": 1,\n      \"course_id\": 1,\n      \"title\": \"Phase 1 - Backend API\",\n      \"description\": \"Build REST API with PostgreSQL\",\n      \"due_date\": \"2026-02-26\",\n      \"status\": \"Pending\",\n      \"created_at\": \"2026-02-26T12:00:00.000Z\",\n      \"course_name\": \"Full Stack Development\",\n      \"course_code\": \"PROG2500\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET Single Assignment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assignments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "assignments", "1"]
+            },
+            "description": "Get a specific assignment by its ID. Replace 1 with actual assignment_id. Expected: 200 OK or 404"
+          },
+          "response": [
+            {
+              "name": "200 OK - Assignment Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/assignments/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"assignment_id\": 1,\n    \"course_id\": 1,\n    \"title\": \"Phase 1 - Backend API\",\n    \"description\": \"Build REST API with PostgreSQL\",\n    \"due_date\": \"2026-02-26\",\n    \"status\": \"Pending\",\n    \"course_name\": \"Full Stack Development\",\n    \"course_code\": \"PROG2500\"\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/assignments/9999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments", "9999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Assignment not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET Assignments by Course ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assignments/courses/1/assignments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "assignments", "courses", "1", "assignments"]
+            },
+            "description": "Get all assignments for a specific course. Replace 1 with actual course_id. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - Assignments for Course",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/assignments/courses/1/assignments",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments", "courses", "1", "assignments"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"count\": 1,\n  \"data\": [\n    {\n      \"assignment_id\": 1,\n      \"course_id\": 1,\n      \"title\": \"Phase 1 - Backend API\",\n      \"due_date\": \"2026-02-26\",\n      \"status\": \"Pending\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST Create Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_id\": 1,\n  \"title\": \"Phase 1 - Backend API\",\n  \"description\": \"Build REST API with Node.js, Express, and PostgreSQL\",\n  \"due_date\": \"2026-02-26\",\n  \"status\": \"Pending\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/assignments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "assignments"]
+            },
+            "description": "Create a new assignment linked to a course. course_id must belong to the authenticated user. Expected: 201 Created"
+          },
+          "response": [
+            {
+              "name": "201 Created - Assignment Added",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"course_id\": 1,\n  \"title\": \"Phase 1 - Backend API\",\n  \"description\": \"Build REST API with Node.js, Express, and PostgreSQL\",\n  \"due_date\": \"2026-02-26\",\n  \"status\": \"Pending\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/assignments",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Assignment created successfully\",\n  \"data\": {\n    \"assignment_id\": 1,\n    \"course_id\": 1,\n    \"title\": \"Phase 1 - Backend API\",\n    \"description\": \"Build REST API with Node.js, Express, and PostgreSQL\",\n    \"due_date\": \"2026-02-26\",\n    \"status\": \"Pending\",\n    \"created_at\": \"2026-02-26T12:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "400 Bad Request - Missing Fields",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Missing course_id and due_date\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/assignments",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Please provide course_id, title, and due_date\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT Update Assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Phase 1 - Backend API (Updated)\",\n  \"status\": \"Completed\",\n  \"due_date\": \"2026-02-26\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/assignments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "assignments", "1"]
+            },
+            "description": "Update an existing assignment. Replace 1 with actual assignment_id. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - Assignment Updated",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Phase 1 - Backend API (Updated)\",\n  \"status\": \"Completed\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/assignments/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Assignment updated successfully\",\n  \"data\": {\n    \"assignment_id\": 1,\n    \"course_id\": 1,\n    \"title\": \"Phase 1 - Backend API (Updated)\",\n    \"status\": \"Completed\"\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"Completed\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/assignments/9999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments", "9999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Assignment not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/assignments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "assignments", "1"]
+            },
+            "description": "Delete an assignment by ID. Replace 1 with actual assignment_id. Expected: 200 OK"
+          },
+          "response": [
+            {
+              "name": "200 OK - Assignment Deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/assignments/1",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments", "1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Assignment deleted successfully\",\n  \"data\": {\n    \"assignment_id\": 1,\n    \"title\": \"Phase 1 - Backend API\"\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                "url": {
+                  "raw": "{{base_url}}/api/assignments/9999",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "assignments", "9999"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"message\": \"Assignment not found\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

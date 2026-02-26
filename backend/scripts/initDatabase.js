@@ -64,45 +64,13 @@ const initDatabase = async () => {
     `);
     console.log('✅ Created indexes');
 
-    // Insert sample data
-    console.log('🔄 Inserting sample data...');
-
-    // Insert sample users (password is 'password123' hashed with bcrypt)
-    await pool.query(`
-      INSERT INTO users (name, email, password_hash) VALUES
-      ('Shubhreet Kaur', 'shubhreet@example.com', '$2b$10$YourHashedPasswordHere'),
-      ('Test Student', 'test@example.com', '$2b$10$YourHashedPasswordHere');
-    `);
-    console.log('✅ Inserted sample users');
-
-    // Insert sample courses
-    await pool.query(`
-      INSERT INTO courses (user_id, course_name, course_code, semester) VALUES
-      (1, 'Full Stack Development', 'PROG2500', 'Winter 2026'),
-      (1, 'Database Management', 'PROG1400', 'Winter 2026'),
-      (1, 'Web Programming', 'PROG1700', 'Winter 2026'),
-      (2, 'Mobile Development', 'PROG3000', 'Winter 2026');
-    `);
-    console.log('✅ Inserted sample courses');
-
-    // Insert sample assignments
-    await pool.query(`
-      INSERT INTO assignments (course_id, title, description, due_date, status) VALUES
-      (1, 'Sprint 1 - Backend API', 'Build REST API with PostgreSQL', '2026-02-15', 'Pending'),
-      (1, 'Sprint 2 - Frontend', 'Create React frontend', '2026-03-01', 'Pending'),
-      (2, 'Database Design Project', 'Design normalized database schema', '2026-02-20', 'Pending'),
-      (2, 'SQL Queries Assignment', 'Write complex SQL queries', '2026-02-12', 'Completed'),
-      (3, 'HTML/CSS Portfolio', 'Build personal portfolio website', '2026-02-18', 'Completed'),
-      (3, 'JavaScript Mini-Project', 'Interactive web application', '2026-02-25', 'Pending'),
-      (4, 'Android App Development', 'Build native Android app', '2026-03-05', 'Pending');
-    `);
-    console.log('✅ Inserted sample assignments');
-
     console.log('🎉 Database initialization completed successfully!');
-    console.log('📊 Summary:');
-    console.log('   - 2 users created');
-    console.log('   - 4 courses created');
-    console.log('   - 7 assignments created');
+    console.log('📊 Tables created: users, courses, assignments');
+    console.log('');
+    console.log('Next steps:');
+    console.log('   1. Register a user via POST /api/auth/register');
+    console.log('   2. Login via POST /api/auth/login to get your JWT token');
+    console.log('   3. Use the token to create courses and assignments');
     
     process.exit(0);
   } catch (error) {
