@@ -84,9 +84,14 @@ app.use((err, req, res, next) => {
 // Start server
 const startServer = async () => {
   try {
-    // Test database connection
-    await pool.query('SELECT NOW()');
-    console.log('✅ Database connection verified');
+    // Test database connection (optional for demo mode)
+    try {
+      await pool.query('SELECT NOW()');
+      console.log('✅ Database connection verified');
+    } catch (dbError) {
+      console.log('⚠️  Database not available - running in demo mode');
+      console.log('   Error:', dbError.message);
+    }
     
     // Start listening
     app.listen(PORT, () => {
@@ -114,7 +119,6 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
-    console.error('💡 Make sure to run "npm run init-db" first to create database tables');
     process.exit(1);
   }
 };
