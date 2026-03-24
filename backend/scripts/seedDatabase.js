@@ -17,23 +17,23 @@ const seedDatabase = async () => {
         password_hash: hashedPassword
       },
       {
-        name: 'Shubhreet Singh',
-        email: 'shubhreet.singh@example.com',
+        name: 'Shubhreet',
+        email: 'shubhreet1@example.com',
         password_hash: hashedPassword
       },
       {
-        name: 'Shubhreet Sharma',
-        email: 'shubhreet.sharma@example.com',
+        name: 'Shubhreet User',
+        email: 'shubhreet2@example.com',
         password_hash: hashedPassword
       },
       {
-        name: 'Shubhreet Patel',
-        email: 'shubhreet.patel@example.com',
+        name: 'Shubhreet Demo',
+        email: 'shubhreet3@example.com',
         password_hash: hashedPassword
       },
       {
-        name: 'Shubhreet Kumar',
-        email: 'shubhreet.kumar@example.com',
+        name: 'Shubhreet Student',
+        email: 'shubhreet4@example.com',
         password_hash: hashedPassword
       }
     ];
