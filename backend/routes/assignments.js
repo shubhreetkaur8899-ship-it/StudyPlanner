@@ -43,7 +43,6 @@ router.get('/courses/:id/assignments', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get course assignments error:', error);
     res.status(500).json({
       success: false,
       message: 'Error retrieving assignments'
@@ -72,7 +71,6 @@ router.get('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get assignments error:', error);
     res.status(500).json({
       success: false,
       message: 'Error retrieving assignments'
@@ -116,7 +114,6 @@ router.get('/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get assignment error:', error);
     res.status(500).json({
       success: false,
       message: 'Error retrieving assignment'
@@ -173,7 +170,6 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Create assignment error:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating assignment'
@@ -270,7 +266,6 @@ router.put('/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Update assignment error:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating assignment'
@@ -320,7 +315,6 @@ router.delete('/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Delete assignment error:', error);
     res.status(500).json({
       success: false,
       message: 'Error deleting assignment'

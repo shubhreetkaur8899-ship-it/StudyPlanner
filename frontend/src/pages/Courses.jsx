@@ -20,7 +20,7 @@ function Courses() {
       })
       setCourses(response.data.data || [])
     } catch (error) {
-      console.error('Error fetching courses:', error)
+      // Handle error silently
     } finally {
       setLoading(false)
     }
@@ -42,7 +42,7 @@ function Courses() {
       setShowForm(false)
       fetchCourses()
     } catch (error) {
-      console.error('Error creating course:', error)
+      // Handle error silently
     }
   }
 
@@ -54,7 +54,7 @@ function Courses() {
       })
       fetchCourses()
     } catch (error) {
-      console.error('Error deleting course:', error)
+      // Handle error silently
     }
   }
 

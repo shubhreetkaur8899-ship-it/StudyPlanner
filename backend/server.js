@@ -22,7 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
   next();
 });
 
@@ -87,38 +86,15 @@ const startServer = async () => {
     // Test database connection (optional for demo mode)
     try {
       await pool.query('SELECT NOW()');
-      console.log('✅ Database connection verified');
     } catch (dbError) {
-      console.log('⚠️  Database not available - running in demo mode');
-      console.log('   Error:', dbError.message);
+      // Database not available - continue in demo mode
     }
     
     // Start listening
     app.listen(PORT, () => {
-      console.log('');
-      console.log('╔════════════════════════════════════════╗');
-      console.log('║                                        ║');
-      console.log('║   📚 StudyPlanner API Running 📚      ║');
-      console.log('║                                        ║');
-      console.log(`║   Port: ${PORT}                           ║`);
-      console.log(`║   Environment: ${process.env.NODE_ENV || 'development'}            ║`);
-      console.log('║                                        ║');
-      console.log('║   Ready to plan your studies! 🎯      ║');
-      console.log('║                                        ║');
-      console.log('╚════════════════════════════════════════╝');
-      console.log('');
-      console.log('📡 API Endpoints:');
-      console.log('   - GET  /health           - Database health check');
-      console.log('   - POST /api/auth/register - Register new user');
-      console.log('   - POST /api/auth/login    - User login');
-      console.log('   - GET  /api/courses       - Get all courses');
-      console.log('   - GET  /api/assignments   - Get all assignments');
-      console.log('');
-      console.log('💡 Tip: Run "npm run init-db" to initialize database tables');
-      console.log('');
+      // Server started
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 };

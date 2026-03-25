@@ -96,7 +96,6 @@
                   "if (pm.response.code === 201) {",
                   "    const body = pm.response.json();",
                   "    pm.collectionVariables.set('token', body.data.token);",
-                  "    console.log('Token saved:', body.data.token);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -178,7 +177,6 @@
                   "if (pm.response.code === 200) {",
                   "    const body = pm.response.json();",
                   "    pm.collectionVariables.set('token', body.data.token);",
-                  "    console.log('Token saved:', body.data.token);",
                   "}"
                 ],
                 "type": "text/javascript"

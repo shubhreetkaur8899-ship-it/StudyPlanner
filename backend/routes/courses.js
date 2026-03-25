@@ -24,7 +24,6 @@ router.get('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get courses error:', error);
     res.status(500).json({
       success: false,
       message: 'Error retrieving courses'
@@ -57,7 +56,6 @@ router.get('/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get course error:', error);
     res.status(500).json({
       success: false,
       message: 'Error retrieving course'
@@ -92,7 +90,6 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Create course error:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating course'
@@ -165,7 +162,6 @@ router.put('/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Update course error:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating course'
@@ -199,7 +195,6 @@ router.delete('/:id', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Delete course error:', error);
     res.status(500).json({
       success: false,
       message: 'Error deleting course'

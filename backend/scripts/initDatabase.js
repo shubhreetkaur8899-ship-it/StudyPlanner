@@ -3,15 +3,13 @@ const { pool } = require('../config/database');
 
 const initDatabase = async () => {
   try {
-    console.log('🔄 Initializing StudyPlanner database...');
 
     // Drop existing tables (be careful in production!)
     await pool.query(`
       DROP TABLE IF EXISTS assignments CASCADE;
       DROP TABLE IF EXISTS courses CASCADE;
       DROP TABLE IF EXISTS users CASCADE;
-    `);
-    console.log('✅ Dropped existing tables');
+    });
 
     // Create users table
     await pool.query(`
@@ -23,7 +21,6 @@ const initDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    console.log('✅ Created users table');
 
     // Create courses table
     await pool.query(`
@@ -37,7 +34,6 @@ const initDatabase = async () => {
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
       );
     `);
-    console.log('✅ Created courses table');
 
     // Create assignments table
     await pool.query(`
@@ -53,7 +49,6 @@ const initDatabase = async () => {
         CHECK (status IN ('Pending', 'Completed'))
       );
     `);
-    console.log('✅ Created assignments table');
 
     // Create indexes for better performance
     await pool.query(`
@@ -62,19 +57,9 @@ const initDatabase = async () => {
       CREATE INDEX idx_assignments_status ON assignments(status);
       CREATE INDEX idx_assignments_due_date ON assignments(due_date);
     `);
-    console.log('✅ Created indexes');
-
-    console.log('🎉 Database initialization completed successfully!');
-    console.log('📊 Tables created: users, courses, assignments');
-    console.log('');
-    console.log('Next steps:');
-    console.log('   1. Register a user via POST /api/auth/register');
-    console.log('   2. Login via POST /api/auth/login to get your JWT token');
-    console.log('   3. Use the token to create courses and assignments');
     
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error initializing database:', error);
     process.exit(1);
   }
 };

@@ -4,12 +4,8 @@ const { pool } = require('../config/database');
 
 const seedDatabase = async () => {
   try {
-    console.log('🌱 Seeding database with demo data...\n');
-
     // Hash passwords
     const hashedPassword = await bcrypt.hash('Password123', 10);
-
-    console.log('👤 Adding demo users...');
     const usersData = [
       {
         name: 'Shubhreet Kaur',
@@ -45,10 +41,7 @@ const seedDatabase = async () => {
         [user.name, user.email, user.password_hash]
       );
       userIds.push(result.rows[0].user_id);
-      console.log(`   ✅ Created: ${user.name} (${user.email})`);
     }
-
-    console.log('\n📚 Adding demo courses...');
     const courses = [
       { userId: userIds[0], name: 'Web Development', code: 'CS101', semester: 'Spring 2026' },
       { userId: userIds[0], name: 'Database Design', code: 'CS201', semester: 'Spring 2026' },
@@ -64,10 +57,7 @@ const seedDatabase = async () => {
         [course.userId, course.name, course.code, course.semester]
       );
       courseIds.push(result.rows[0].course_id);
-      console.log(`   ✅ Created: ${course.name} (${course.code})`);
     }
-
-    console.log('\n✅ Adding demo assignments...');
     const assignments = [
       { courseId: courseIds[0], title: 'React Todo App', description: 'Build a todo application with React', dueDate: '2026-04-01', status: 'Pending' },
       { courseId: courseIds[0], title: 'Express REST API', description: 'Create a REST API with Express', dueDate: '2026-04-05', status: 'Completed' },
@@ -81,22 +71,10 @@ const seedDatabase = async () => {
         'INSERT INTO assignments (course_id, title, description, due_date, status) VALUES ($1, $2, $3, $4, $5)',
         [assignment.courseId, assignment.title, assignment.description, assignment.dueDate, assignment.status]
       );
-      console.log(`   ✅ Created: ${assignment.title} - Due: ${assignment.dueDate} - Status: ${assignment.status}`);
     }
-
-    console.log('\n🎉 === DEMO DATA SEEDING COMPLETED ===\n');
-    console.log('📊 Summary:');
-    console.log(`   ✅ ${usersData.length} Users created`);
-    console.log(`   ✅ ${courses.length} Courses created`);
-    console.log(`   ✅ ${assignments.length} Assignments created`);
-    console.log('\n🔐 Test Login Credentials:');
-    console.log('   Email: shubhreet@example.com');
-    console.log('   Password: Password123');
-    console.log('\n✨ All users have the same password for easy testing!\n');
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
     process.exit(1);
   }
 };

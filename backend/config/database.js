@@ -15,22 +15,18 @@ let dbConnected = false;
 // Test database connection immediately
 pool.query('SELECT NOW()', (err, result) => {
   if (err) {
-    console.log('⚠️  Database connection failed at startup:', err.message);
-    console.log('💡 Make sure DATABASE_URL is valid in .env');
+    dbConnected = false;
   } else {
-    console.log('✅ Database connected successfully');
     dbConnected = true;
   }
 });
 
 // Test database connection
 pool.on('connect', () => {
-  console.log('✅ New connection to PostgreSQL database established');
   dbConnected = true;
 });
 
 pool.on('error', (err) => {
-  console.error('⚠️  Database connection error:', err.message);
   dbConnected = false;
 });
 
@@ -44,12 +40,8 @@ const query = async (text, params) => {
       )
     ]);
     
-    const duration = Date.now();
-    console.log('✓ Query executed', { rows: res.rowCount });
     return res;
   } catch (error) {
-    console.error('❌ Database query error:', error.message);
-    console.error('   Query:', text);
     throw error;
   }
 };

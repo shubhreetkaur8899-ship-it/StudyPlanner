@@ -26,7 +26,6 @@ const authMiddleware = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
     
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({

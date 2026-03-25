@@ -26,7 +26,7 @@ function Assignments() {
       setAssignments(assignmentsRes.data.data || [])
       setCourses(coursesRes.data.data || [])
     } catch (error) {
-      console.error('Error fetching data:', error)
+      // Handle error silently
     } finally {
       setLoading(false)
     }
@@ -48,7 +48,7 @@ function Assignments() {
       setShowForm(false)
       fetchData()
     } catch (error) {
-      console.error('Error creating assignment:', error)
+      // Handle error silently
     }
   }
 
@@ -60,7 +60,7 @@ function Assignments() {
       })
       fetchData()
     } catch (error) {
-      console.error('Error deleting assignment:', error)
+      // Handle error silently
     }
   }
 
