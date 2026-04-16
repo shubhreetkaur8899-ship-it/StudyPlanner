@@ -1,7 +1,7 @@
 .navbar {
-  background-color: #333;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   padding: 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.3);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -10,66 +10,83 @@
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 15px 20px;
+  padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 60px;
 }
 
 .navbar-brand {
-  color: white;
-  font-size: 24px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
   cursor: pointer;
   margin: 0;
-  transition: color 0.3s;
+  letter-spacing: -0.3px;
+  transition: opacity 0.2s;
 }
 
 .navbar-brand:hover {
-  color: #667eea;
+  opacity: 0.85;
 }
 
 .nav-links {
   display: flex;
   list-style: none;
-  gap: 30px;
+  gap: 4px;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
 .nav-links a {
-  color: white;
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   cursor: pointer;
-  transition: color 0.3s;
   font-size: 14px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
 .nav-links a:hover {
-  color: #667eea;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .logout-btn {
-  background-color: #dc3545;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 8px 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
   font-size: 13px;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 8px;
 }
 
 .logout-btn:hover {
-  background-color: #c82333;
+  background: rgba(239, 68, 68, 0.8);
+  border-color: transparent;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .navbar-container {
+    padding: 0 16px;
+    height: auto;
     flex-direction: column;
-    gap: 15px;
+    gap: 0;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 
   .nav-links {
-    gap: 15px;
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }

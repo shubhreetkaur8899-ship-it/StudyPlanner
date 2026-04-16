@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
-import CourseCard from '../components/CourseCard'
+import { coursesAPI, assignmentsAPI } from '../services/api'
 import './Dashboard.css'
 
 function Dashboard() {
   const [stats, setStats] = useState({ totalCourses: 0, totalAssignments: 0, dueToday: 0, overdue: 0 })
   const [recentAssignments, setRecentAssignments] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     fetchDashboardData()
@@ -14,24 +14,24 @@ function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('authToken')
-      const config = { headers: { Authorization: `Bearer ${token}` } }
-
       const [coursesRes, assignmentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/courses', config),
-        axios.get('http://localhost:5000/api/assignments', config)
+        coursesAPI.getAll(),
+        assignmentsAPI.getAll()
       ])
+
+      const today = new Date().toISOString().split('T')[0]
+      const assignments = assignmentsRes.data.data || []
 
       setStats({
         totalCourses: coursesRes.data.count || 0,
         totalAssignments: assignmentsRes.data.count || 0,
-        dueToday: assignmentsRes.data.data?.filter(a => a.due_date === new Date().toISOString().split('T')[0]).length || 0,
-        overdue: assignmentsRes.data.data?.filter(a => a.due_date < new Date().toISOString().split('T')[0] && a.status !== 'completed').length || 0
+        dueToday: assignments.filter(a => a.due_date?.split('T')[0] === today).length,
+        overdue: assignments.filter(a => a.due_date?.split('T')[0] < today && a.status !== 'Completed').length
       })
 
-      setRecentAssignments(assignmentsRes.data.data?.slice(0, 5) || [])
-    } catch (error) {
-      // Handle error silently
+      setRecentAssignments(assignments.slice(0, 5))
+    } catch (err) {
+      setError('Failed to load dashboard data. Please refresh.')
     } finally {
       setLoading(false)
     }
@@ -39,43 +39,72 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h1>Dashboard</h1>
-      
+      <div className="dashboard-header">
+        <h1>Dashboard</h1>
+        <p className="dashboard-subtitle">Welcome back! Here&apos;s your study overview.</p>
+      </div>
+
+      {error && <div className="error-banner">{error}</div>}
+
       <div className="stats-grid">
         <div className="stat-card">
-          <h3>Total Courses</h3>
-          <p className="stat-number">{stats.totalCourses}</p>
+          <div className="stat-icon">📚</div>
+          <div className="stat-info">
+            <h3>Total Courses</h3>
+            <p className="stat-number">{stats.totalCourses}</p>
+          </div>
         </div>
         <div className="stat-card">
-          <h3>Total Assignments</h3>
-          <p className="stat-number">{stats.totalAssignments}</p>
+          <div className="stat-icon">📋</div>
+          <div className="stat-info">
+            <h3>Total Assignments</h3>
+            <p className="stat-number">{stats.totalAssignments}</p>
+          </div>
         </div>
-        <div className="stat-card">
-          <h3>Due Today</h3>
-          <p className="stat-number">{stats.dueToday}</p>
+        <div className="stat-card today-card">
+          <div className="stat-icon">📅</div>
+          <div className="stat-info">
+            <h3>Due Today</h3>
+            <p className="stat-number">{stats.dueToday}</p>
+          </div>
         </div>
-        <div className="stat-card overdue">
-          <h3>Overdue</h3>
-          <p className="stat-number">{stats.overdue}</p>
+        <div className="stat-card overdue-card">
+          <div className="stat-icon">⚠️</div>
+          <div className="stat-info">
+            <h3>Overdue</h3>
+            <p className="stat-number">{stats.overdue}</p>
+          </div>
         </div>
       </div>
 
-      <div className="recent-assignments">
+      <div className="recent-section">
         <h2>Recent Assignments</h2>
         {loading ? (
-          <p>Loading...</p>
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading...</p>
+          </div>
         ) : recentAssignments.length > 0 ? (
           <div className="assignment-list">
             {recentAssignments.map(assignment => (
-              <div key={assignment.id} className="assignment-item">
-                <h4>{assignment.title}</h4>
-                <p>Due: {new Date(assignment.due_date).toLocaleDateString()}</p>
-                <p>Status: <span className={`status ${assignment.status}`}>{assignment.status}</span></p>
+              <div key={assignment.assignment_id} className="assignment-item">
+                <div className="assignment-item-left">
+                  <h4>{assignment.title}</h4>
+                  <p className="course-label">📚 {assignment.course_name || 'Unknown Course'}</p>
+                  <p className="due-label">
+                    📅 Due: {new Date(assignment.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </p>
+                </div>
+                <span className={`status-pill ${assignment.status.toLowerCase()}`}>
+                  {assignment.status === 'Completed' ? '✅' : '⏱️'} {assignment.status}
+                </span>
               </div>
             ))}
           </div>
         ) : (
-          <p>No assignments yet</p>
+          <div className="empty-state">
+            <p>📭 No assignments yet. <a href="/assignments">Create one</a> to get started!</p>
+          </div>
         )}
       </div>
     </div>

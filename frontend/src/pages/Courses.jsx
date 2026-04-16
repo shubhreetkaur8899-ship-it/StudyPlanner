@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { coursesAPI } from '../services/api'
 import './Courses.css'
 
 function Courses() {
@@ -11,20 +11,22 @@ function Courses() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const API_BASE = 'http://localhost:5000/api'
-
   useEffect(() => {
     fetchCourses()
   }, [])
 
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(''), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [success])
+
   const fetchCourses = async () => {
     try {
-      const token = localStorage.getItem('authToken')
-      const response = await axios.get(`${API_BASE}/courses`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await coursesAPI.getAll()
       setCourses(response.data.data || [])
-    } catch (error) {
+    } catch (err) {
       setError('Failed to load courses')
     } finally {
       setLoading(false)
@@ -41,35 +43,26 @@ function Courses() {
     setError('')
     setSuccess('')
 
-    // Validate required fields
     if (!formData.course_name || !formData.course_code) {
       setError('Course Name and Code are required!')
       return
     }
 
     try {
-      const token = localStorage.getItem('authToken')
-
       if (editingId) {
-        // UPDATE
-        await axios.put(`${API_BASE}/courses/${editingId}`, formData, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await coursesAPI.update(editingId, formData)
         setSuccess('Course updated successfully!')
         setEditingId(null)
       } else {
-        // CREATE
-        await axios.post(`${API_BASE}/courses`, formData, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        await coursesAPI.create(formData)
         setSuccess('Course created successfully!')
       }
 
       setFormData({ course_name: '', course_code: '', semester: '' })
       setShowForm(false)
       fetchCourses()
-    } catch (error) {
-      setError(error.response?.data?.message || 'Error saving course')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error saving course')
     }
   }
 
@@ -85,15 +78,11 @@ function Courses() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this course?')) return
-
     try {
-      const token = localStorage.getItem('authToken')
-      await axios.delete(`${API_BASE}/courses/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await coursesAPI.delete(id)
       setSuccess('Course deleted successfully!')
       fetchCourses()
-    } catch (error) {
+    } catch (err) {
       setError('Error deleting course')
     }
   }
@@ -107,23 +96,27 @@ function Courses() {
 
   return (
     <div className="courses-container">
-      <h1>📚 Courses Management</h1>
+      <div className="page-header">
+        <h1>Courses</h1>
+        <button
+          onClick={() => { setShowForm(!showForm); if (showForm) handleCancel() }}
+          className="btn-add"
+        >
+          {showForm ? '✕ Cancel' : '+ Add Course'}
+        </button>
+      </div>
 
-      {error && <div className="error-message">❌ {error}</div>}
-      {success && <div className="success-message">✅ {success}</div>}
-
-      <button onClick={() => setShowForm(!showForm)} className="btn-add">
-        {showForm ? '✕ Cancel' : '+ Add New Course'}
-      </button>
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">{success}</div>}
 
       {showForm && (
         <form onSubmit={handleSubmit} className="course-form">
           <h3>{editingId ? 'Edit Course' : 'Create New Course'}</h3>
-          
+
           <input
             type="text"
             name="course_name"
-            placeholder="Course Name (e.g., Web Development)"
+            placeholder="Course Name (e.g., Web Development) *"
             value={formData.course_name}
             onChange={handleChange}
             required
@@ -132,7 +125,7 @@ function Courses() {
           <input
             type="text"
             name="course_code"
-            placeholder="Course Code (e.g., CS101)"
+            placeholder="Course Code (e.g., CS101) *"
             value={formData.course_code}
             onChange={handleChange}
             required
@@ -148,7 +141,7 @@ function Courses() {
 
           <div className="form-buttons">
             <button type="submit" className="btn-submit">
-              {editingId ? '✏️ Update Course' : '✨ Create Course'}
+              {editingId ? 'Update Course' : 'Create Course'}
             </button>
             <button type="button" onClick={handleCancel} className="btn-cancel">
               Cancel
@@ -159,7 +152,10 @@ function Courses() {
 
       <div className="courses-grid">
         {loading ? (
-          <p className="loading">Loading courses...</p>
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading courses...</p>
+          </div>
         ) : courses.length > 0 ? (
           courses.map(course => (
             <div key={course.course_id} className="course-card">
@@ -170,31 +166,21 @@ function Courses() {
 
               <div className="card-body">
                 {course.semester && (
-                  <p className="semester">📅 <strong>Semester:</strong> {course.semester}</p>
+                  <p className="semester">📅 {course.semester}</p>
                 )}
-                <p className="created-date">📆 Created: {new Date(course.created_at).toLocaleDateString()}</p>
+                <p className="created-date">Created: {new Date(course.created_at).toLocaleDateString()}</p>
               </div>
 
               <div className="card-actions">
-                <button 
-                  onClick={() => handleEdit(course)} 
-                  className="btn-edit"
-                  title="Edit course"
-                >
-                  ✏️ Edit
-                </button>
-                <button 
-                  onClick={() => handleDelete(course.course_id)} 
-                  className="btn-delete"
-                  title="Delete course"
-                >
-                  🗑️ Delete
-                </button>
+                <button onClick={() => handleEdit(course)} className="btn-edit">Edit</button>
+                <button onClick={() => handleDelete(course.course_id)} className="btn-delete">Delete</button>
               </div>
             </div>
           ))
         ) : (
-          <p className="no-courses">📭 No courses yet. Create one to get started!</p>
+          <div className="empty-state">
+            <p>📭 No courses yet. Create one to get started!</p>
+          </div>
         )}
       </div>
     </div>

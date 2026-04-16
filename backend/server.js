@@ -90,11 +90,11 @@ const startServer = async () => {
       // Database not available - continue in demo mode
     }
     
-    // Start listening
     app.listen(PORT, () => {
-      // Server started
+      console.log(`Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
     });
   } catch (error) {
+    console.error('Failed to start server:', error.message);
     process.exit(1);
   }
 };

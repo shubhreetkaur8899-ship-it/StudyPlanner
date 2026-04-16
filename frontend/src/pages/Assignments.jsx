@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { coursesAPI, assignmentsAPI } from '../services/api'
 import './Assignments.css'
 
 function Assignments() {
@@ -16,7 +16,6 @@ function Assignments() {
     fetchData()
   }, [])
 
-  // Auto-clear messages after 3 seconds
   useEffect(() => {
     if (error || success) {
       const timer = setTimeout(() => {
@@ -30,19 +29,15 @@ function Assignments() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('authToken')
-      const config = { headers: { Authorization: `Bearer ${token}` } }
-
       const [assignmentsRes, coursesRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/assignments', config),
-        axios.get('http://localhost:5000/api/courses', config)
+        assignmentsAPI.getAll(),
+        coursesAPI.getAll()
       ])
-
       setAssignments(assignmentsRes.data.data || [])
       setCourses(coursesRes.data.data || [])
       setError('')
-    } catch (error) {
-      setError('❌ Failed to load assignments: ' + (error.response?.data?.message || error.message))
+    } catch (err) {
+      setError('Failed to load data: ' + (err.response?.data?.message || err.message))
     } finally {
       setLoading(false)
     }
@@ -55,32 +50,27 @@ function Assignments() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.title || !formData.due_date || !formData.course_id) {
-      setError('❌ Please fill in all required fields')
+      setError('Please fill in all required fields')
       return
     }
 
     try {
-      const token = localStorage.getItem('authToken')
-      const config = { headers: { Authorization: `Bearer ${token}` } }
-
       if (editingId) {
-        // Update existing assignment
-        await axios.put(`http://localhost:5000/api/assignments/${editingId}`, formData, config)
-        setSuccess('✅ Assignment updated successfully!')
+        await assignmentsAPI.update(editingId, formData)
+        setSuccess('Assignment updated successfully!')
       } else {
-        // Create new assignment
-        await axios.post('http://localhost:5000/api/assignments', formData, config)
-        setSuccess('✅ Assignment created successfully!')
+        await assignmentsAPI.create(formData)
+        setSuccess('Assignment created successfully!')
       }
 
       setFormData({ title: '', description: '', due_date: '', course_id: '', status: 'Pending' })
       setEditingId(null)
       setShowForm(false)
       fetchData()
-    } catch (error) {
-      setError('❌ ' + (error.response?.data?.message || error.message))
+    } catch (err) {
+      setError(err.response?.data?.message || err.message)
     }
   }
 
@@ -88,7 +78,7 @@ function Assignments() {
     setFormData({
       title: assignment.title,
       description: assignment.description || '',
-      due_date: assignment.due_date.split('T')[0], // Format date for input
+      due_date: assignment.due_date.split('T')[0],
       course_id: assignment.course_id,
       status: assignment.status
     })
@@ -104,17 +94,13 @@ function Assignments() {
   }
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this assignment?')) {
-      try {
-        const token = localStorage.getItem('authToken')
-        await axios.delete(`http://localhost:5000/api/assignments/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        setSuccess('✅ Assignment deleted successfully!')
-        fetchData()
-      } catch (error) {
-        setError('❌ Failed to delete assignment: ' + (error.response?.data?.message || error.message))
-      }
+    if (!window.confirm('Are you sure you want to delete this assignment?')) return
+    try {
+      await assignmentsAPI.delete(id)
+      setSuccess('Assignment deleted successfully!')
+      fetchData()
+    } catch (err) {
+      setError('Failed to delete: ' + (err.response?.data?.message || err.message))
     }
   }
 
@@ -125,27 +111,36 @@ function Assignments() {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year: 'numeric', month: 'short', day: 'numeric'
     })
+  }
+
+  const isOverdue = (dueDate, status) => {
+    return dueDate.split('T')[0] < new Date().toISOString().split('T')[0] && status !== 'Completed'
   }
 
   return (
     <div className="assignments-container">
-      <h1>📋 Assignments</h1>
+      <div className="page-header">
+        <h1>Assignments</h1>
+        <button
+          onClick={() => {
+            setShowForm(!showForm)
+            if (showForm) handleCancel()
+          }}
+          className="btn-add"
+        >
+          {showForm ? '✕ Cancel' : '+ Add Assignment'}
+        </button>
+      </div>
 
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
-      <button onClick={() => setShowForm(!showForm)} className="btn-add">
-        {showForm ? '❌ Cancel' : '➕ Add New Assignment'}
-      </button>
-
       {showForm && (
         <form onSubmit={handleSubmit} className="assignment-form">
-          <h3>{editingId ? '✏️ Edit Assignment' : '📝 New Assignment'}</h3>
-          
+          <h3>{editingId ? 'Edit Assignment' : 'New Assignment'}</h3>
+
           <input
             type="text"
             name="title"
@@ -154,7 +149,7 @@ function Assignments() {
             onChange={handleChange}
             required
           />
-          
+
           <textarea
             name="description"
             placeholder="Description (optional)"
@@ -162,15 +157,27 @@ function Assignments() {
             onChange={handleChange}
             rows="3"
           />
-          
-          <input
-            type="date"
-            name="due_date"
-            value={formData.due_date}
-            onChange={handleChange}
-            required
-          />
-          
+
+          <div className="form-row">
+            <div className="form-field">
+              <label>Due Date *</label>
+              <input
+                type="date"
+                name="due_date"
+                value={formData.due_date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-field">
+              <label>Status</label>
+              <select name="status" value={formData.status} onChange={handleChange}>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+          </div>
+
           <select name="course_id" value={formData.course_id} onChange={handleChange} required>
             <option value="">Select Course *</option>
             {courses.map(course => (
@@ -179,18 +186,13 @@ function Assignments() {
               </option>
             ))}
           </select>
-          
-          <select name="status" value={formData.status} onChange={handleChange}>
-            <option value="Pending">Pending</option>
-            <option value="Completed">Completed</option>
-          </select>
-          
+
           <div className="form-buttons">
             <button type="submit" className="btn-submit">
-              {editingId ? '💾 Update Assignment' : '➕ Create Assignment'}
+              {editingId ? 'Update Assignment' : 'Create Assignment'}
             </button>
             <button type="button" onClick={handleCancel} className="btn-cancel">
-              ❌ Cancel
+              Cancel
             </button>
           </div>
         </form>
@@ -198,43 +200,44 @@ function Assignments() {
 
       <div className="assignments-grid">
         {loading ? (
-          <p className="loading">⏳ Loading assignments...</p>
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading assignments...</p>
+          </div>
         ) : assignments.length > 0 ? (
           assignments.map(assignment => (
-            <div key={assignment.assignment_id} className="assignment-card">
+            <div
+              key={assignment.assignment_id}
+              className={`assignment-card${isOverdue(assignment.due_date, assignment.status) ? ' overdue-card' : ''}`}
+            >
               <div className="card-header">
                 <h3>{assignment.title}</h3>
                 <span className={`status-badge ${assignment.status.toLowerCase()}`}>
                   {assignment.status === 'Completed' ? '✅' : '⏱️'} {assignment.status}
                 </span>
               </div>
-              
+
               <div className="card-body">
                 {assignment.description && (
                   <p className="description">{assignment.description}</p>
                 )}
                 <p className="course">📚 {getCourseName(assignment.course_id)}</p>
-                <p className="due-date">📅 Due: {formatDate(assignment.due_date)}</p>
+                <p className={`due-date${isOverdue(assignment.due_date, assignment.status) ? ' overdue-text' : ''}`}>
+                  📅 Due: {formatDate(assignment.due_date)}
+                  {isOverdue(assignment.due_date, assignment.status) && <span className="overdue-label"> · Overdue</span>}
+                </p>
               </div>
-              
+
               <div className="card-actions">
-                <button 
-                  onClick={() => handleEdit(assignment)} 
-                  className="btn-edit"
-                >
-                  ✏️ Edit
-                </button>
-                <button 
-                  onClick={() => handleDelete(assignment.assignment_id)} 
-                  className="btn-delete"
-                >
-                  🗑️ Delete
-                </button>
+                <button onClick={() => handleEdit(assignment)} className="btn-edit">Edit</button>
+                <button onClick={() => handleDelete(assignment.assignment_id)} className="btn-delete">Delete</button>
               </div>
             </div>
           ))
         ) : (
-          <p className="no-assignments">📭 No assignments yet. Create one to get started!</p>
+          <div className="empty-state">
+            <p>📭 No assignments yet. Create one to get started!</p>
+          </div>
         )}
       </div>
     </div>
