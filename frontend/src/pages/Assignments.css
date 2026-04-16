@@ -13,12 +13,13 @@
 .btn-add {
   background-color: #667eea;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 20px;
   font-size: 14px;
+  font-weight: 600;
   transition: background-color 0.3s;
 }
 
@@ -28,44 +29,84 @@
 
 .assignment-form {
   background: white;
-  padding: 20px;
+  padding: 25px;
   border-radius: 8px;
   margin-bottom: 30px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-width: 500px;
+  max-width: 600px;
+}
+
+.assignment-form h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 18px;
 }
 
 .assignment-form input,
 .assignment-form textarea,
 .assignment-form select {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
   font-family: inherit;
+  transition: border-color 0.3s;
+}
+
+.assignment-form input:focus,
+.assignment-form textarea:focus,
+.assignment-form select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .btn-submit {
+  flex: 1;
   background-color: #28a745;
   color: white;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s;
 }
 
 .btn-submit:hover {
   background-color: #218838;
 }
 
-.assignments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.btn-cancel {
+  flex: 1;
+  background-color: #6c757d;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+.assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
 }
 
 .assignment-card {
@@ -73,62 +114,148 @@
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   border-left: 5px solid #667eea;
 }
 
-.assignment-card h3 {
-  color: #333;
-  margin-bottom: 10px;
+.assignment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-.description {
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.card-header h3 {
+  color: #333;
+  font-size: 18px;
+  margin: 0;
+  flex: 1;
+}
+
+.status-badge {
+  background-color: #667eea;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-badge.pending {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.status-badge.completed {
+  background-color: #28a745;
+  color: white;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-body p {
+  margin: 0;
   color: #666;
-  margin-bottom: 10px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
+.description {
+  color: #555;
+  font-size: 14px;
+}
+
+.course {
+  font-size: 14px;
+  color: #667eea;
+  font-weight: 600;
+}
+
 .due-date {
-  color: #666;
   font-size: 13px;
-  margin-bottom: 8px;
+  color: #999;
+  font-style: italic;
 }
 
-.status {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 3px;
-  font-size: 12px;
-  font-weight: bold;
-  margin-bottom: 12px;
+.card-actions {
+  display: flex;
+  gap: 10px;
 }
 
-.status.pending {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status.in-progress {
-  background-color: #cfe2ff;
-  color: #084298;
-}
-
-.status.completed {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.btn-delete {
-  background-color: #dc3545;
+.btn-edit {
+  flex: 1;
+  background-color: #17a2b8;
   color: white;
-  padding: 8px 15px;
+  padding: 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  align-self: flex-start;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-edit:hover {
+  background-color: #138496;
+}
+
+.btn-delete {
+  flex: 1;
+  background-color: #dc3545;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.3s;
 }
 
 .btn-delete:hover {
   background-color: #c82333;
+}
+
+.loading,
+.no-assignments {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+  font-size: 16px;
+  grid-column: 1 / -1;
+}
+
+/* Error and Success Messages */
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #f5c6cb;
+}
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #c3e6cb;
 }

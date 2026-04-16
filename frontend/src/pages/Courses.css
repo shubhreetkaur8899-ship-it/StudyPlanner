@@ -13,12 +13,13 @@
 .btn-add {
   background-color: #667eea;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 20px;
   font-size: 14px;
+  font-weight: 600;
   transition: background-color 0.3s;
 }
 
@@ -28,41 +29,78 @@
 
 .course-form {
   background: white;
-  padding: 20px;
+  padding: 25px;
   border-radius: 8px;
   margin-bottom: 30px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-width: 500px;
+  max-width: 600px;
 }
 
-.course-form input,
-.course-form textarea {
-  padding: 10px;
+.course-form h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.course-form input {
+  padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.course-form input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .btn-submit {
+  flex: 1;
   background-color: #28a745;
   color: white;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s;
 }
 
 .btn-submit:hover {
   background-color: #218838;
 }
 
+.btn-cancel {
+  flex: 1;
+  background-color: #6c757d;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
 .courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
@@ -71,43 +109,131 @@
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .course-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-.course-card h3 {
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.card-header h3 {
   color: #333;
-  margin-bottom: 8px;
+  font-size: 18px;
+  margin: 0;
+  flex: 1;
 }
 
-.course-code {
-  color: #667eea;
-  font-weight: bold;
-  margin-bottom: 10px;
+.course-code-badge {
+  background-color: #667eea;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.course-card p {
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-body p {
+  margin: 0;
   color: #666;
-  font-size: 13px;
-  margin-bottom: 15px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
-.btn-delete {
-  background-color: #dc3545;
+.semester {
+  font-size: 14px;
+  color: #555;
+}
+
+.created-date {
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit {
+  flex: 1;
+  background-color: #17a2b8;
   color: white;
-  padding: 8px 15px;
+  padding: 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-edit:hover {
+  background-color: #138496;
+}
+
+.btn-delete {
+  flex: 1;
+  background-color: #dc3545;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.3s;
 }
 
 .btn-delete:hover {
   background-color: #c82333;
+}
+
+.loading,
+.no-courses {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+  font-size: 16px;
+  grid-column: 1 / -1;
+}
+
+/* Error and Success Messages */
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #f5c6cb;
+}
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #c3e6cb;
 }
