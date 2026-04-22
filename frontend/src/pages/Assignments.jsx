@@ -5,9 +5,12 @@ import './Assignments.css'
 function Assignments() {
   const [assignments, setAssignments] = useState([])
   const [courses, setCourses] = useState([])
-  const [formData, setFormData] = useState({ title: '', description: '', due_date: '', course_id: '', status: 'Pending' })
+  const [formData, setFormData] = useState({
+    title: '', description: '', due_date: '', course_id: '', status: 'Pending'
+  })
   const [editingId, setEditingId] = useState(null)
   const [showForm, setShowForm] = useState(false)
+  const [filter, setFilter] = useState('all')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(true)
@@ -18,10 +21,7 @@ function Assignments() {
 
   useEffect(() => {
     if (error || success) {
-      const timer = setTimeout(() => {
-        setError('')
-        setSuccess('')
-      }, 3000)
+      const timer = setTimeout(() => { setError(''); setSuccess('') }, 3000)
       return () => clearTimeout(timer)
     }
   }, [error, success])
@@ -85,6 +85,7 @@ function Assignments() {
     setEditingId(assignment.assignment_id)
     setShowForm(true)
     setError('')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleCancel = () => {
@@ -94,13 +95,29 @@ function Assignments() {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this assignment?')) return
+    if (!window.confirm('Delete this assignment?')) return
     try {
       await assignmentsAPI.delete(id)
       setSuccess('Assignment deleted successfully!')
-      fetchData()
+      // Optimistic update — remove from list immediately
+      setAssignments(prev => prev.filter(a => a.assignment_id !== id))
     } catch (err) {
       setError('Failed to delete: ' + (err.response?.data?.message || err.message))
+    }
+  }
+
+  // Toggle between Pending and Completed without opening the edit form
+  const handleToggleStatus = async (assignment) => {
+    const newStatus = assignment.status === 'Completed' ? 'Pending' : 'Completed'
+    try {
+      await assignmentsAPI.update(assignment.assignment_id, { ...assignment, status: newStatus })
+      setAssignments(prev =>
+        prev.map(a =>
+          a.assignment_id === assignment.assignment_id ? { ...a, status: newStatus } : a
+        )
+      )
+    } catch (err) {
+      setError('Failed to update status')
     }
   }
 
@@ -109,25 +126,34 @@ function Assignments() {
     return course?.course_name || 'Unknown Course'
   }
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric', month: 'short', day: 'numeric'
     })
-  }
 
-  const isOverdue = (dueDate, status) => {
-    return dueDate.split('T')[0] < new Date().toISOString().split('T')[0] && status !== 'Completed'
+  const isOverdue = (dueDate, status) =>
+    dueDate.split('T')[0] < new Date().toISOString().split('T')[0] && status !== 'Completed'
+
+  // Client-side filtering by status tab
+  const filtered = filter === 'all'
+    ? assignments
+    : assignments.filter(a => a.status.toLowerCase() === filter)
+
+  const counts = {
+    all: assignments.length,
+    pending: assignments.filter(a => a.status === 'Pending').length,
+    completed: assignments.filter(a => a.status === 'Completed').length
   }
 
   return (
     <div className="assignments-container">
       <div className="page-header">
-        <h1>Assignments</h1>
+        <div>
+          <h1>Assignments</h1>
+          <p className="page-subtitle">{assignments.length} total assignment{assignments.length !== 1 ? 's' : ''}</p>
+        </div>
         <button
-          onClick={() => {
-            setShowForm(!showForm)
-            if (showForm) handleCancel()
-          }}
+          onClick={() => { setShowForm(!showForm); if (showForm) handleCancel() }}
           className="btn-add"
         >
           {showForm ? '✕ Cancel' : '+ Add Assignment'}
@@ -139,7 +165,7 @@ function Assignments() {
 
       {showForm && (
         <form onSubmit={handleSubmit} className="assignment-form">
-          <h3>{editingId ? 'Edit Assignment' : 'New Assignment'}</h3>
+          <h3>{editingId ? '✏️ Edit Assignment' : '📋 New Assignment'}</h3>
 
           <input
             type="text"
@@ -198,14 +224,28 @@ function Assignments() {
         </form>
       )}
 
+      {/* Filter tabs */}
+      <div className="filter-tabs">
+        {['all', 'pending', 'completed'].map(tab => (
+          <button
+            key={tab}
+            className={`filter-tab ${filter === tab ? 'active' : ''}`}
+            onClick={() => setFilter(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            <span className="tab-count">{counts[tab]}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="assignments-grid">
         {loading ? (
           <div className="loading-state">
             <div className="loading-spinner"></div>
             <p>Loading assignments...</p>
           </div>
-        ) : assignments.length > 0 ? (
-          assignments.map(assignment => (
+        ) : filtered.length > 0 ? (
+          filtered.map(assignment => (
             <div
               key={assignment.assignment_id}
               className={`assignment-card${isOverdue(assignment.due_date, assignment.status) ? ' overdue-card' : ''}`}
@@ -224,11 +264,20 @@ function Assignments() {
                 <p className="course">📚 {getCourseName(assignment.course_id)}</p>
                 <p className={`due-date${isOverdue(assignment.due_date, assignment.status) ? ' overdue-text' : ''}`}>
                   📅 Due: {formatDate(assignment.due_date)}
-                  {isOverdue(assignment.due_date, assignment.status) && <span className="overdue-label"> · Overdue</span>}
+                  {isOverdue(assignment.due_date, assignment.status) && (
+                    <span className="overdue-label"> · Overdue</span>
+                  )}
                 </p>
               </div>
 
               <div className="card-actions">
+                {/* Quick status toggle */}
+                <button
+                  onClick={() => handleToggleStatus(assignment)}
+                  className={`btn-toggle ${assignment.status === 'Completed' ? 'undo' : 'done'}`}
+                >
+                  {assignment.status === 'Completed' ? '↩ Undo' : '✓ Done'}
+                </button>
                 <button onClick={() => handleEdit(assignment)} className="btn-edit">Edit</button>
                 <button onClick={() => handleDelete(assignment.assignment_id)} className="btn-delete">Delete</button>
               </div>
@@ -236,7 +285,11 @@ function Assignments() {
           ))
         ) : (
           <div className="empty-state">
-            <p>📭 No assignments yet. Create one to get started!</p>
+            <p>
+              {filter === 'all'
+                ? '📭 No assignments yet. Create one to get started!'
+                : `📭 No ${filter} assignments.`}
+            </p>
           </div>
         )}
       </div>
