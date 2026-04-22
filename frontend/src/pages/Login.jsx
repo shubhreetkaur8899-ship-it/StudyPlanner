@@ -17,14 +17,12 @@ function Login({ onLogin }) {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
 
-    if (name === 'confirmPassword' || name === 'password') {
-      if (isSignup) {
-        setPasswordMatch(
-          name === 'password'
-            ? value === (formData.confirmPassword || '')
-            : value === (formData.password || '')
-        )
-      }
+    if (isSignup && (name === 'confirmPassword' || name === 'password')) {
+      setPasswordMatch(
+        name === 'password'
+          ? value === formData.confirmPassword
+          : value === formData.password
+      )
     }
   }
 
@@ -53,7 +51,8 @@ function Login({ onLogin }) {
       const response = await axios.post(endpoint, payload)
 
       if (response.data.success) {
-        onLogin(response.data.data.token)
+        const { token, user } = response.data.data
+        onLogin(token, user?.name || '')
         navigate('/')
       }
     } catch (err) {
@@ -78,7 +77,9 @@ function Login({ onLogin }) {
           <h1>StudyPlanner</h1>
         </div>
         <h2>{isSignup ? 'Create Account' : 'Welcome Back'}</h2>
-        <p className="login-subtitle">{isSignup ? 'Start tracking your assignments today' : 'Sign in to your account'}</p>
+        <p className="login-subtitle">
+          {isSignup ? 'Start tracking your assignments today' : 'Sign in to your account'}
+        </p>
 
         {error && <div className="error-message">{error}</div>}
 
