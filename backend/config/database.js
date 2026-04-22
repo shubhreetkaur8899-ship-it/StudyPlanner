@@ -5,8 +5,9 @@ require('dotenv').config();
 // Uses DATABASE_URL environment variable (set in .env for local dev, auto-set by Render in production)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  connectionTimeoutMillis: 5000,
+  // Accept self-signed certs from all cloud PostgreSQL providers (Neon, Render, Supabase)
+  ssl: process.env.DATABASE_URL?.includes('localhost') ? false : { rejectUnauthorized: false },
+  connectionTimeoutMillis: 10000,
   idleTimeoutMillis: 30000
 });
 

@@ -9,7 +9,7 @@ const initDatabase = async () => {
       DROP TABLE IF EXISTS assignments CASCADE;
       DROP TABLE IF EXISTS courses CASCADE;
       DROP TABLE IF EXISTS users CASCADE;
-    });
+    `);
 
     // Create users table
     await pool.query(`
