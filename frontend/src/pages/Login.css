@@ -3,15 +3,15 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   padding: 20px;
 }
 
 .login-card {
   background: #fff;
   padding: 44px 40px;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(102, 126, 234, 0.3);
   width: 100%;
   max-width: 420px;
 }
@@ -21,17 +21,20 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .logo-icon {
-  font-size: 32px;
+  font-size: 34px;
 }
 
 .login-logo h1 {
   font-size: 26px;
-  font-weight: 800;
-  color: #6366f1;
+  font-weight: 900;
+  background: linear-gradient(135deg, #6366f1, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   letter-spacing: -0.5px;
 }
 
@@ -71,11 +74,12 @@
 .form-group input {
   padding: 11px 14px;
   border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 14px;
   color: #1f2937;
   background: #f9fafb;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  font-family: inherit;
 }
 
 .form-group input:focus {
@@ -95,34 +99,28 @@
   margin-top: 2px;
 }
 
-.match-success {
-  color: #16a34a;
-  font-weight: 600;
-}
-
-.match-error {
-  color: #dc2626;
-  font-weight: 600;
-}
+.match-success { color: #16a34a; font-weight: 600; }
+.match-error   { color: #dc2626; font-weight: 600; }
 
 .btn-primary {
   background: linear-gradient(135deg, #6366f1, #7c3aed);
   color: #fff;
   padding: 13px;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   margin-top: 4px;
   transition: all 0.2s;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
   letter-spacing: 0.02em;
+  font-family: inherit;
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -162,6 +160,7 @@
   padding: 0;
   text-decoration: underline;
   text-underline-offset: 2px;
+  font-family: inherit;
 }
 
 .link-button:hover {
@@ -169,7 +168,5 @@
 }
 
 @media (max-width: 480px) {
-  .login-card {
-    padding: 32px 24px;
-  }
+  .login-card { padding: 32px 24px; }
 }
