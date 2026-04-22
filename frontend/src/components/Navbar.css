@@ -1,7 +1,7 @@
 .navbar {
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   padding: 0;
-  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 2px 16px rgba(79, 70, 229, 0.35);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -14,17 +14,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 60px;
+  height: 62px;
 }
 
 .navbar-brand {
   color: #fff;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   cursor: pointer;
-  margin: 0;
   letter-spacing: -0.3px;
   transition: opacity 0.2s;
+  user-select: none;
 }
 
 .navbar-brand:hover {
@@ -34,59 +34,74 @@
 .nav-links {
   display: flex;
   list-style: none;
-  gap: 4px;
+  gap: 2px;
   margin: 0;
   padding: 0;
   align-items: center;
 }
 
-.nav-links a {
-  color: rgba(255, 255, 255, 0.85);
+.nav-link {
+  color: rgba(255, 255, 255, 0.78);
   text-decoration: none;
-  cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  padding: 8px 14px;
+  padding: 7px 14px;
   border-radius: 8px;
-  transition: all 0.2s;
+  transition: all 0.18s;
+  display: block;
 }
 
-.nav-links a:hover {
+.nav-link:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.13);
+  text-decoration: none;
+}
+
+/* Active route gets a distinct pill background */
+.nav-link.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+  font-weight: 700;
+}
+
+.nav-greeting {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  padding: 0 10px;
+  font-style: italic;
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.13);
   color: #fff;
-  padding: 8px 16px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  padding: 7px 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.8);
+  background: rgba(239, 68, 68, 0.78);
   border-color: transparent;
 }
 
 @media (max-width: 640px) {
   .navbar-container {
-    padding: 0 16px;
+    padding: 10px 16px;
     height: auto;
     flex-direction: column;
-    gap: 0;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    gap: 8px;
   }
-
   .nav-links {
     gap: 2px;
     flex-wrap: wrap;
     justify-content: center;
+  }
+  .nav-greeting {
+    display: none;
   }
 }

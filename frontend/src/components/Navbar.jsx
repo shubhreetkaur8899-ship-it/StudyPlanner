@@ -1,22 +1,29 @@
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import './Navbar.css'
 
-function Navbar({ onLogout }) {
+function Navbar({ onLogout, userName }) {
   const navigate = useNavigate()
+  const firstName = userName ? userName.split(' ')[0] : ''
 
   const handleLogout = () => {
     onLogout()
     navigate('/login')
   }
 
+  // NavLink className helper — adds "active" when route matches
+  const linkClass = ({ isActive }) => isActive ? 'nav-link active' : 'nav-link'
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <h1 className="navbar-brand" onClick={() => navigate('/')}>StudyPlanner</h1>
+        <span className="navbar-brand" onClick={() => navigate('/')}>
+          📚 StudyPlanner
+        </span>
         <ul className="nav-links">
-          <li><a onClick={() => navigate('/')}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/courses')}>Courses</a></li>
-          <li><a onClick={() => navigate('/assignments')}>Assignments</a></li>
+          <li><NavLink to="/" end className={linkClass}>Dashboard</NavLink></li>
+          <li><NavLink to="/courses" className={linkClass}>Courses</NavLink></li>
+          <li><NavLink to="/assignments" className={linkClass}>Assignments</NavLink></li>
+          {firstName && <li className="nav-greeting">Hi, {firstName}</li>}
           <li><button onClick={handleLogout} className="logout-btn">Logout</button></li>
         </ul>
       </div>
